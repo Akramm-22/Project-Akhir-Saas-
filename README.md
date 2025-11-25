@@ -1,36 +1,144 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+
+# Minimal Community — Blog & API
+
+Web + API stack yang mereplikasi desain [Figma Minimal Blog Community](https://www.figma.com/design/qIjpbLlfZV1MjbTPMxy2AF/Minimal-Blog--Community-?node-id=0-1&p=f&t=67isWirKYtLtb5Kr-0) dengan peningkatan UI modern, animasi halus, serta koneksi data nyata antara Next.js (frontend) dan Express (backend).
+
+</div>
+
+## Tech Stack
+
+- **Frontend:** Next.js 16 (App Router, TypeScript), Tailwind CSS v4, Framer Motion, Lucide Icons
+- **Backend:** Express.js + TypeScript, Zod validation, Helmet + CORS
+- **Tooling:** npm, ESLint (Next default), TS path alias, Radix Slot, Node 20+
+
+## Project Structure
+
+```
+berita-islam/
+├─ src/
+│  ├─ app/                    # Next.js App Router
+│  │  ├─ layout.tsx          # Root layout dengan metadata SEO
+│  │  ├─ page.tsx            # Homepage
+│  │  ├─ globals.css         # Global styles & Tailwind
+│  │  └─ posts/
+│  │     └─ [id]/
+│  │        └─ page.tsx      # Dynamic post detail page
+│  ├─ components/
+│  │  ├─ layout/             # Header & Footer
+│  │  │  ├─ site-header.tsx
+│  │  │  └─ site-footer.tsx
+│  │  ├─ sections/           # Page sections
+│  │  │  ├─ hero-section.tsx
+│  │  │  ├─ content-hub.tsx
+│  │  │  ├─ community-section.tsx
+│  │  │  └─ newsletter-section.tsx
+│  │  └─ ui/                 # Reusable UI components
+│  │     ├─ button.tsx
+│  │     ├─ badge.tsx
+│  │     └─ skeleton.tsx
+│  └─ lib/                   # Utilities & API client
+│     ├─ api.ts              # API functions
+│     ├─ config.ts           # API endpoints config
+│     ├─ types.ts            # TypeScript types
+│     └─ utils.ts            # Helper functions
+├─ public/                   # Static assets
+├─ server/                   # Express API (TypeScript)
+│  ├─ src/
+│  │  ├─ app.ts             # Express app setup
+│  │  ├─ index.ts           # Server entry point
+│  │  ├─ config/            # Configuration
+│  │  ├─ controllers/       # Route controllers
+│  │  ├─ routes/            # API routes
+│  │  ├─ services/          # Business logic
+│  │  ├─ middleware/        # Express middleware
+│  │  ├─ validators/        # Zod schemas
+│  │  ├─ types/             # TypeScript types
+│  │  └─ data/              # Mock data
+│  ├─ package.json
+│  └─ tsconfig.json
+├─ next.config.ts
+├─ package.json              # Frontend scripts/deps
+└─ README.md
+```
+
+## Environment Variables
+
+Buat file environment variables berikut:
+
+- **Frontend `.env.local` (di root):**
+  ```
+  NEXT_PUBLIC_API_URL=http://localhost:5000/api
+  ```
+
+- **Backend `server/.env`:**
+  ```
+  PORT=5000
+  NODE_ENV=development
+  CORS_ORIGIN=http://localhost:3000
+  ```
+
+> **Catatan:** Buat file `.env.local` di root dan `.env` di folder `server/` secara manual dengan konten di atas. File `.env.example` tidak dapat dibuat otomatis karena pembatasan workspace.
 
 ## Getting Started
 
-First, run the development server:
+Clone repo lalu install dependensi frontend:
+
+```bash
+npm install
+```
+
+Install dependensi backend:
+
+```bash
+cd server
+npm install
+```
+
+### Development
+
+Jalankan API terlebih dahulu (default port `5000`):
+
+```bash
+cd server
+npm run dev
+```
+
+Kemudian jalankan Next.js (default port `3000`):
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Kunjungi `http://localhost:3000` untuk melihat UI yang sudah mengambil data dari `http://localhost:5000/api`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Production Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# frontend
+npm run build
+npm start
 
-## Learn More
+# backend
+cd server
+npm run build
+npm start
+```
 
-To learn more about Next.js, take a look at the following resources:
+Deploy frontend ke Vercel/Node hosting apa pun, dan deploy folder `server` ke layanan Node (Railway, Render, dsb). Jangan lupa men-set `NEXT_PUBLIC_API_URL` di environment frontend agar menunjuk ke domain API produksi.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## API Reference
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Semua endpoint diprefiks `http://<HOST>:<PORT>/api`.
 
-## Deploy on Vercel
+| Method | Endpoint                    | Deskripsi                                    |
+| ------ | --------------------------- | -------------------------------------------- |
+| GET    | `/posts`                    | List artikel, dukung query `featured`, `category` |
+| GET    | `/posts/:id`                | Detail artikel berdasarkan ID                |
+| POST   | `/posts`                    | Membuat artikel baru (Zod validated)         |
+| PUT    | `/posts/:id`                | Memperbarui artikel                          |
+| DELETE | `/posts/:id`                | Menghapus artikel                            |
+| POST   | `/newsletter/subscribe`     | Menyimpan subscriber newsletter              |
+| GET    | `/health`                   | Cek status API                               |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
